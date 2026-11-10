@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=80", "setuptools-scm[simple]>=9.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "andap"
+description = "Automatic Nest Detection for Adélie Penguins"
+dynamic = ["version"]
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE.txt"]
+authors = [
+    {name = "Luca Vill", email = "luca.vill@fau.de"},
+    {name = "Alexander Winterl"}
+]
+maintainers = [
+    {name = "Luca Vill", email = "luca.vill@fau.de"}
+]
+requires-python = ">=3.9, <3.13"
+dependencies = [
+    "tensorflow[and-cuda]",
+    "numpy",
+    "scikit-image",
+    "scipy",
+    "pandas",
+    "geopandas",
+    "shapely",
+    "tqdm",
+    "matplotlib",
+    "numba",
+    "rasterio",
+    "pyproj",
+    "Pillow"
+]
+
+[project.urls]
+repository = "https://github.com/whoi-mars/andap"
+
+[tool.setuptools.packages.find]
+where = ["src"]
