@@ -11,7 +11,44 @@ except ImportError:
     import importlib_resources as resources
 
 
-pretrained_models = {}
+pretrained_models = {
+    "3.2cm_DI": {
+        "resolution": 3.2,  # cm/px
+        "objectness_threshold": 0.26,
+        "overlap_threshold": 0.43,
+        "classification_threshold": 0.40,
+        "training_params": {
+            "epochs": 200,
+            "object_loss_scale": 37.0,
+            "kld_loss_scale": 1.0,
+            "class_loss_scale": 0.011,
+        },
+    },
+    "4.3cm_DI": {
+        "resolution": 4.3,
+        "objectness_threshold": 0.34,
+        "overlap_threshold": 0.44,
+        "classification_threshold": 0.36,
+        "training_params": {
+            "epochs": 200,
+            "object_loss_scale": 31.0,
+            "kld_loss_scale": 1.0,
+            "class_loss_scale": 0.007,
+        },
+    },
+    "5.4cm_DI": {
+        "resolution": 5.4,
+        "objectness_threshold": 0.29,
+        "overlap_threshold": 0.46,
+        "classification_threshold": 0.44,
+        "training_params": {
+            "epochs": 200,
+            "object_loss_scale": 13.0,
+            "kld_loss_scale": 1.0,
+            "class_loss_scale": 9e-6,
+        },
+    },
+}
 
 
 def kld(A, B):
@@ -291,7 +328,7 @@ class Model:
         if weights != None:
             if weights in pretrained_models.keys():
                 self.model.load_weights(
-                    resources.files("andap.models").joinpath(weights + ".weights.h5")
+                    resources.files("andap").joinpath("models", weights + ".weights.h5")
                 )
                 self.obj_thresh = pretrained_models[weights]["objectness_threshold"]
                 self.overlap_thresh = pretrained_models[weights]["overlap_threshold"]
