@@ -13,7 +13,9 @@ class DataGenAugment(tf.keras.utils.Sequence):
     Data generator with random cropping and flipping for data augmentation.
     """
 
-    def __init__(self, path, batch_size=64, shuffle=True, rng_seed=0, **kwargs):
+    def __init__(
+        self, path, batch_size=64, shuffle=True, drop_last=True, rng_seed=0, **kwargs
+    ):
         """
         Initializes data generator used for training.
 
@@ -21,6 +23,7 @@ class DataGenAugment(tf.keras.utils.Sequence):
             path (str): Path to training dataset.
             batch_size (int, optional): Number of samples per batch. Defaults to 64.
             shuffle (bool, optional): If True (default), samples are shuffled after each epoch.
+            drop_last (bool, optional): If True (default), the last batch is dropped if it contains fewer samples.
             rng_seed (int, optional): Seed for random number generators. Defaults to 0.
         """
         super().__init__(**kwargs)
@@ -43,12 +46,16 @@ class DataGenAugment(tf.keras.utils.Sequence):
         if shuffle:
             self.rng.shuffle(self.filenames)
         self.shuffle = shuffle
+        self.drop_last = drop_last
 
         self.nChannels = 3
         self.img_format = 128
 
     def __len__(self):
-        return int(np.ceil(len(self.filenames) * 4 / float(self.batch_size)))
+        if self.drop_last:
+            return int(np.floor(len(self.filenames) * 4 / self.batch_size))
+        else:
+            return int(np.ceil(len(self.filenames) * 4 / self.batch_size))
 
     def __getitem__(self, idx):
         actual_bs = min(
@@ -194,19 +201,22 @@ class DataGen(tf.keras.utils.Sequence):
     Data Generator without augmentation for validation data.
     """
 
-    def __init__(self, path, batch_size=64, rng_seed=0, **kwargs):
+    def __init__(self, path, batch_size=64, drop_last=True, rng_seed=0, **kwargs):
         """
         Initializes data generator used for validation.
 
         Args:
             path (str): Path to validation dataset.
             batch_size (int, optional): Number of samples per batch. Defaults to 64.
+            drop_last (bool, optional): If True (default), the last batch is dropped if it contains fewer samples.
             rng_seed (int, optional): Seed for random number generators. Defaults to 0.
         """
         super().__init__(**kwargs)
 
         self.rng = random.Random(rng_seed)
         self.np_rng = np.random.default_rng(rng_seed)
+
+        self.drop_last = drop_last
 
         self.path = path
 
@@ -225,7 +235,10 @@ class DataGen(tf.keras.utils.Sequence):
         self.nChannels = 3
 
     def __len__(self):
-        return int(np.ceil(len(self.filenames) / float(self.batch_size)))
+        if self.drop_last:
+            return int(np.floor(len(self.filenames) / self.batch_size))
+        else:
+            return int(np.ceil(len(self.filenames) / self.batch_size))
 
     def __getitem__(self, idx):
         actual_bs = min(self.batch_size, len(self.filenames) - idx * self.batch_size)
